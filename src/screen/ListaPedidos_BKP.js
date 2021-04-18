@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, ActivityIndicator, Modal, Alert, TouchableOpacity } from 'react-native';
+import { SafeAreaView, View, ActivityIndicator, Modal, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import db, { firebase } from '@react-native-firebase/firestore';
-import { Button, Card, Container, Content, Fab, Icon, Right, Switch, Tab, Text, Tabs, Badge } from 'native-base';
+import { Button, Card, Container, Content, Fab, Icon, Right, Switch, Tab, Text, Tabs } from 'native-base';
 import DadosApp from '../cfg';
 import { BtnNav, Cabecalho } from '../components/header';
 import { CardPedido, CardST } from '../components';
@@ -20,58 +20,19 @@ const DB = db().collection(INF.Categoria).doc(INF.ID_APP);
 const ListaPedidos = ({ navigation }) => {
 
 	const [listaPedidos, setListaPedidos] = useState([]);
-	const [contaPedidos, setContaPedidos] = useState([]);
-	const [contaExecucao, setContaExecucao] = useState([]);
-	const [contaEntrega, setContaEntrega] = useState([]);
 	const [id, setId] = useState();
 	const [hora, setHora] = useState(moment().format('LTS'));
 	const [data, setData] = useState(moment().format('L'));
 	const [segundo, setSegundo] = useState(0);
-	const [abas, setAbas] = useState(0);
 
 	useEffect(() => {
-		const DBs = DB.collection('Pedidos')
+		DB.collection('Pedidos')
 			.where('Data_Pedido', '==', data)
 			.orderBy("Hora_Pedido", "asc")
 			.onSnapshot(snp => {
 				setListaPedidos(snp.docs)
 			});
-
-			return ()=> DBs();
 	}, []);
-
-	useFocusEffect(React.useCallback(() => {
-		const subscriber = DB.collection('Pedidos')
-			.where('Data_Pedido', '==', InfData)
-			.where('Execucao', '==', false)
-			.where('Entrega', '==', false)
-			.onSnapshot(snp => {
-				setContaPedidos(snp.docs);
-			});
-		return () => subscriber();
-	}, [])); //Conta Pedidos
-
-	useFocusEffect(React.useCallback(() => {
-		const subscriber = DB.collection('Pedidos')
-			.where('Data_Pedido', '==', InfData)
-			.where('Execucao', '==', true)
-			.where('Entrega', '==', false)
-			.onSnapshot(snp => {
-				setContaExecucao(snp.docs);
-			});
-		return () => subscriber();
-	}, [])); //Conta Pedidos em Execução
-
-	useFocusEffect(React.useCallback(() => {
-		const subscriber = DB.collection('Pedidos')
-			.where('Data_Pedido', '==', InfData)
-			.where('Execucao', '==', true)
-			.where('Entrega', '==', true)
-			.onSnapshot(snp => {
-				setContaEntrega(snp.docs);
-			});
-		return () => subscriber();
-	}, [])); //Conta Pedidos pronto pra entrega
 
 	function Execucao(valor, ID, index) {
 		var val = valor;
@@ -151,6 +112,45 @@ const ListaPedidos = ({ navigation }) => {
 		);
 	}
 
+	function Envio(valor, ID, index) {
+		var val = valor;
+		return (
+			<Switch value={val ? true : false} onValueChange={() => {
+				Alert.alert(
+					"Atenção!",
+					val ? "Deseja realmente retirar este pedido da execução?" : "Deseja realmente por este pedido em execução?",
+					[
+						{
+							text: "Não",
+							onPress: () => null,
+							style: "cancel"
+						},
+						{
+							text: "Sim",
+							onPress: () => {
+								DB.collection('Pedidos')
+									.where('ID_pdd', '==', ID)
+									.get().then(snp => {
+										val = val ? false : true;
+										setId(snp.docs.map((sn) => {
+											DB.collection('Pedidos')
+												.doc(sn.id)
+												.update({
+													Entrega: val
+												})
+										})
+										)
+									}).catch(e => {
+									})
+							}
+						}
+					]
+				);
+
+			}} />
+		);
+	}
+
 	const pedidosUser = (array, hora) => {
 		const pdd = array.map((ped, index) => {
 			return (
@@ -185,37 +185,10 @@ const ListaPedidos = ({ navigation }) => {
 		return pdd;
 	}
 
-	const CartaoDinheiro = ({ modoPagamento, emMaos, troco }) => {
-
-		if (modoPagamento == 'Dinheiro') {
-			return (
-				<View style={{flexDirection:'row',alignItems:'center',}}>
-					<Text style={{ color: '#FF6B00', fontWeight: 'bold', fontSize: 13 }}>Em mãos: </Text>
-					<Text style={{ color: '#fff', fontSize: 13 }}>{emMaos}</Text>
-					<Text style={{ color: '#51557D', fontSize: 25 }}> | </Text>
-
-					<Text style={{ color: '#FF6B00', fontWeight: 'bold', fontSize: 13 }}>Troco: </Text>
-					<Text style={{ color: '#fff', fontSize: 13 }}>{troco}</Text>
-				</View>
-			);
-		}else{
-
-			return(
-				<View style={{flexDirection:'row'}}>
-					<Text style={{ color: '#FF6B00', fontWeight: 'bold', fontSize: 13 }}>M.Pagamento: </Text>
-					<Text style={{ color: '#fff', fontSize: 13 }}>Cartão</Text>
-				</View>
-			);
-
-		}
-
-	}
-
 	const ListP = () => {
 		const m = listaPedidos.map((item, index) => {
 
 			if (item.data().Execucao == false) {
-
 				return (
 					<View key={index} style={{ backgroundColor: '#333651' }}>
 						<CardPedido nome={item.data().Endereco.Nome == null ? "" : item.data().Endereco.Nome} key={index}>
@@ -229,9 +202,13 @@ const ListaPedidos = ({ navigation }) => {
 								<Text style={{ color: '#FF6B00', fontWeight: 'bold', fontSize: 13 }}>Total: </Text>
 								<Text style={{ color: '#fff', fontSize: 13 }}>{item.data().Total_Pagar}</Text>
 								<Text style={{ color: '#51557D', fontSize: 25 }}> | </Text>
-									
-								<CartaoDinheiro modoPagamento={item.data().Forma_de_Pagamento} emMaos={item.data().Dinheiro_em_Maos} troco={item.data().Troco}/>
 
+								<Text style={{ color: '#FF6B00', fontWeight: 'bold', fontSize: 13 }}>Em mãos: </Text>
+								<Text style={{ color: '#fff', fontSize: 13 }}>{item.data().Dinheiro_em_Maos}</Text>
+								<Text style={{ color: '#51557D', fontSize: 25 }}> | </Text>
+
+								<Text style={{ color: '#FF6B00', fontWeight: 'bold', fontSize: 13 }}>Troco: </Text>
+								<Text style={{ color: '#fff', fontSize: 13 }}>{item.data().Troco}</Text>
 							</View>
 
 							{/** Endereço e dados para entrega */}
@@ -244,7 +221,7 @@ const ListaPedidos = ({ navigation }) => {
 									<Text style={{ color: '#fff' }}>
 										Rua {item.data().Endereco.Rua}, N°{item.data().Endereco.Numero} {item.data().Endereco.Complemento == "" ? '' : ", " + item.data().Endereco.Complemento}, {item.data().Endereco.Bairro}, {item.data().Endereco.Cidade}
 									</Text>
-									<Text style={{ color: '#fff' }}>P. Referência: {item.data().Endereco.PontoReferencia == '' ? 'Nenhum' : item.data().Endereco.PontoReferencia}</Text>
+									<Text style={{ color: '#fff' }}>P. Referência: {item.data().Endereco.PontoReferencia == ''?'Nenhum':item.data().Endereco.PontoReferencia}</Text>
 									<Text style={{ color: '#fff' }}>Telefone : {item.data().Endereco.Telefone}</Text>
 								</View>
 							</View>
@@ -286,8 +263,12 @@ const ListaPedidos = ({ navigation }) => {
 								<Text style={{ color: '#fff', fontSize: 13 }}>{item.data().Total_Pagar}</Text>
 								<Text style={{ color: '#51557D', fontSize: 25 }}> | </Text>
 
-								<CartaoDinheiro modoPagamento={item.data().Forma_de_Pagamento} emMaos={item.data().Dinheiro_em_Maos} troco={item.data().Troco}/>
+								<Text style={{ color: '#FF6B00', fontWeight: 'bold', fontSize: 13 }}>Em mãos: </Text>
+								<Text style={{ color: '#fff', fontSize: 13 }}>{item.data().Dinheiro_em_Maos}</Text>
+								<Text style={{ color: '#51557D', fontSize: 25 }}> | </Text>
 
+								<Text style={{ color: '#FF6B00', fontWeight: 'bold', fontSize: 13 }}>Troco: </Text>
+								<Text style={{ color: '#fff', fontSize: 13 }}>{item.data().Troco}</Text>
 							</View>
 
 							{/** Endereço e dados para entrega */}
@@ -300,7 +281,6 @@ const ListaPedidos = ({ navigation }) => {
 									<Text style={{ color: '#fff' }}>
 										Rua {item.data().Endereco.Rua}, N°{item.data().Endereco.Numero} {item.data().Endereco.Complemento == "" ? '' : ", " + item.data().Endereco.Complemento}, {item.data().Endereco.Bairro}, {item.data().Endereco.Cidade}
 									</Text>
-									<Text style={{ color: '#fff' }}>P. Referência: {item.data().Endereco.PontoReferencia == '' ? 'Nenhum' : item.data().Endereco.PontoReferencia}</Text>
 									<Text style={{ color: '#fff' }}>Telefone : {item.data().Endereco.Telefone}</Text>
 								</View>
 							</View>
@@ -342,8 +322,12 @@ const ListaPedidos = ({ navigation }) => {
 								<Text style={{ color: '#fff', fontSize: 13 }}>{item.data().Total_Pagar}</Text>
 								<Text style={{ color: '#51557D', fontSize: 25 }}> | </Text>
 
-								<CartaoDinheiro modoPagamento={item.data().Forma_de_Pagamento} emMaos={item.data().Dinheiro_em_Maos} troco={item.data().Troco}/>
+								<Text style={{ color: '#FF6B00', fontWeight: 'bold', fontSize: 13 }}>Em mãos: </Text>
+								<Text style={{ color: '#fff', fontSize: 13 }}>{item.data().Dinheiro_em_Maos}</Text>
+								<Text style={{ color: '#51557D', fontSize: 25 }}> | </Text>
 
+								<Text style={{ color: '#FF6B00', fontWeight: 'bold', fontSize: 13 }}>Troco: </Text>
+								<Text style={{ color: '#fff', fontSize: 13 }}>{item.data().Troco}</Text>
 							</View>
 
 							{/** Endereço e dados para entrega */}
@@ -356,10 +340,19 @@ const ListaPedidos = ({ navigation }) => {
 									<Text style={{ color: '#fff' }}>
 										Rua {item.data().Endereco.Rua}, N°{item.data().Endereco.Numero} {item.data().Endereco.Complemento == "" ? '' : ", " + item.data().Endereco.Complemento}, {item.data().Endereco.Bairro}, {item.data().Endereco.Cidade}
 									</Text>
-									<Text style={{ color: '#fff' }}>P. Referência: {item.data().Endereco.PontoReferencia == '' ? 'Nenhum' : item.data().Endereco.PontoReferencia}</Text>
 									<Text style={{ color: '#fff' }}>Telefone : {item.data().Endereco.Telefone}</Text>
 								</View>
 							</View>
+
+							{/* <View style={{ borderBottomWidth: 1, borderBottomColor: '#51557D', margin: 10, marginBottom: 10 }} />
+							<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+								<View>
+									<Text style={{ color: '#7EE8FF' }}>Entrega</Text>
+								</View>
+								<View>
+									{Entrega(item.data().Entrega, item.data().ID_pdd, index)}
+								</View>
+							</View> */}
 						</CardPedido>
 					</View>
 				);
@@ -369,123 +362,42 @@ const ListaPedidos = ({ navigation }) => {
 
 	}
 
-	const ContaPedidos = ({ modo }) => {
-		switch (modo) {
-			case 'pedidos':
-				return (
-					<Badge style={{ position: 'relative', top: -15 }}>
-						<Text style={{ fontSize: 10 }}>{contaPedidos.length}</Text>
-					</Badge>
-				);
-			case 'execucao':
-				return (
-					<Badge style={{ position: 'relative', top: -15 }}>
-						<Text style={{ fontSize: 10 }}>{contaExecucao.length}</Text>
-					</Badge>
-				);
-			case 'entrega':
-				return (
-					<Badge style={{ position: 'relative', top: -15 }}>
-						<Text style={{ fontSize: 10 }}>{contaEntrega.length}</Text>
-					</Badge>
-				);
-		}
-	};
-
-	const Abas = () => {
-		return (
-			<View>
-				<View>
-					<View style={estiloTab.containerTab}>
-						<TouchableOpacity style={{
-							flexDirection: 'row',
-							backgroundColor: abas != 0 ? '#3E4168' : '#51557D',
-							flex: 1,
-							marginRight: 2,
-							justifyContent: 'center',
-							alignItems: 'center',
-							borderTopLeftRadius: 5,
-							borderBottomLeftRadius: 5,
-						}}
-							onPress={() => {
-								setAbas(0);
-							}}>
-							<Text style={estiloTab.textTab}>Pedido</Text>
-							{contaPedidos.length != 0 ? <ContaPedidos modo="pedidos" /> : null}
-						</TouchableOpacity>
-						<TouchableOpacity style={{
-							flexDirection: 'row',
-							backgroundColor: abas != 1 ? '#3E4168' : '#51557D',
-							flex: 1,
-							justifyContent: 'center',
-							alignItems: 'center',
-						}}
-							onPress={() => {
-								setAbas(1);
-							}}>
-							<Text style={estiloTab.textTab}>Execução</Text>
-							{contaExecucao.length != 0 ? <ContaPedidos modo="execucao" /> : null}
-						</TouchableOpacity>
-						<TouchableOpacity style={{
-							flexDirection: 'row',
-							backgroundColor: abas != 2 ? '#3E4168' : '#51557D',
-							flex: 1,
-							marginLeft: 2,
-							justifyContent: 'center',
-							alignItems: 'center',
-							borderTopRightRadius: 5,
-							borderBottomRightRadius: 5,
-
-						}}
-							onPress={() => {
-								setAbas(2);
-							}}>
-							<Text style={estiloTab.textTab}>Entrega</Text>
-							{contaEntrega.length != 0 ? <ContaPedidos modo="entrega" /> : null}
-						</TouchableOpacity>
-					</View>
-				</View>
-			</View>
-		);
-	}//Abas dos pedidos
-
-	const Pag = () => {
-		switch (abas) {
-			case 0:
-				return ListP();
-			case 1:
-				return ListExec();
-			case 2:
-				return ListFim();
-		}
-	}//Páginas
-
 	return (
 		<Container style={estilo.container}>
 			<BtnNav />
-			<Cabecalho titulo="Pedidos" subtitulo="Lista de pedidos" />
-			<Abas />
 			<Content>
-				<Pag />
+				<Cabecalho titulo="Pedidos" subtitulo="Lista de pedidos" />
+				<View>
+					<Tabs>
+						<Tab heading="Pedidos" activeTabStyle={{backgroundColor:'#333651'}} tabStyle={{backgroundColor:'#51557D'}} >
+							<View style={{ backgroundColor: '#333651', flex: 1 }} >
+								{ListP()}
+							</View>
+						</Tab>
+						<Tab heading="Execução" activeTabStyle={{backgroundColor:'#333651'}} tabStyle={{backgroundColor:'#51557D'}}>
+							<View style={{ backgroundColor: '#333651', flex: 1 }}>
+								{ListExec()}
+							</View>
+						</Tab>
+						<Tab heading="Entrega" activeTabStyle={{backgroundColor:'#333651'}} tabStyle={{backgroundColor:'#51557D'}}>
+							<View style={{ backgroundColor: '#333651', flex: 1 }}>
+								{ListFim()}
+							</View>
+						</Tab>
+					</Tabs>
+				</View>
 			</Content>
+			{/* <Fab
+				position='bottomRight'
+				onPress={() => navigation.navigate('PedidosExecucao', { auto: 0 })}
+				containerStyle={{ marginBottom:40 }}
+				style={{ backgroundColor: "#00D1FF" }}
+			>
+				<Icon name="plus" type="FontAwesome5" style={{ color: '#fff', fontSize: 26 }} />
+			</Fab> */}
 			<RodaPe />
 		</Container>
 	);
 };
-
-const estiloTab = StyleSheet.create({
-	containerTab: {
-		justifyContent: 'center',
-		flexDirection: 'row',
-		margin: 10,
-	},
-	textTab: {
-		color: '#fff',
-		fontSize: 14,
-		textAlign: 'center',
-		marginTop: 10,
-		marginBottom: 10,
-	}
-});
 
 export default ListaPedidos;

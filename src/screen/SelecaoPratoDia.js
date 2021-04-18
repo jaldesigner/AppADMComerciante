@@ -3,8 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { View, TouchableOpacity, Alert, ActivityIndicator, StyleSheet, Modal } from 'react-native';
 import db, { firebase } from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import { Card, CardItem, Container, Content, Icon, Item, Text, Picker } from 'native-base';
-//import {Picker} from '@react-native-community/picker';
+import { Card, CardItem, Container, Content, Icon, Item, Text, Picker, Switch } from 'native-base';
 import DadosApp from '../cfg';
 import { Cabecalho, BtnNav } from '../components/header';
 import { CardTpl, BtnLight, BtnSmallRight, CardST } from '../components';
@@ -111,17 +110,30 @@ const SelecaoPratoDia = ({ navigation }) => {
             <Picker
               onValueChange={valor => {
 
-                arrayValores[index] = {
+                if (valor == "") {
 
-                  medida: mv.data().Medida,
-                  valor: valor,
-                  indice: index,
+                  arrayValores[index] = 'Vazio';
+                  setAutoVal(1);
+                } else {
+
+                  arrayValores[index] = {
+
+                    medida: mv.data().Medida,
+                    valor: valor,
+                    indice: index,
+
+                  }
+
+                  setArrayValores(arrayValores);
+                  setAutoVal(1);
 
                 }
-                setArrayValores(arrayValores);
-                setAutoVal(1);
-              }}
-              selectedValue={arrayValores[index] != undefined ? arrayValores[index].valor : 'Selecione o valor'}
+
+
+              }
+
+              }
+              selectedValue={arrayValores[index] != undefined ? arrayValores[index].valor : arrayValores[index]}
               style={{
                 backgroundColor: "#fff",
                 height: 25,
@@ -137,7 +149,7 @@ const SelecaoPratoDia = ({ navigation }) => {
       );
     });
 
-    if (valueListaPrato !== '') {
+    if (valueListaPrato !== "") {
       return mv;
     }
   }//Exibe os valores e medidas no picker
@@ -246,8 +258,11 @@ const SelecaoPratoDia = ({ navigation }) => {
     let qntMedidas = medidas.length;
     let qntValorSelecionado = arrayValores.length;
 
-    if (qntValorSelecionado != qntMedidas) {
-      alert("Selecione Um valor pra cada medidas ou escolha \"desativado\"")
+    var vz = arrayValores.findIndex(ind => ind == "Vazio");
+    var und = arrayValores.findIndex(ind => ind == undefined);
+
+    if (qntValorSelecionado != qntMedidas || vz != -1 || und != -1) {
+      alert("Selecione Um valor para cada medida ou escolha \"desativado\"")
     } else {
       const criaArray = (array) => {
         const arr = [];
@@ -294,6 +309,46 @@ const SelecaoPratoDia = ({ navigation }) => {
     }
   }//Exibe ou esconde o botão de avançar
 
+  function Swt({valor}) {
+    var val = valor;
+    return (
+      <>
+        <Switch value={val ? true : false} onValueChange={() => {
+          Alert.alert(
+            "Atenção!",
+            val ? "Deseja realmente retirar este pedido da execução?" : "Deseja realmente por este pedido em execução?",
+            [
+              {
+                text: "Não",
+                onPress: () => null,
+                style: "cancel"
+              },
+              {
+                text: "Sim",
+                onPress: () => {
+                  DB.collection('CardapioDoDia')
+                    .get().then(snp => {
+                      val = val ? false : true;
+                      setId(snp.docs.map((sn) => {
+                        DB.collection('CardapioDoDia')
+                          .doc(sn.id)
+                          .update({
+                            Execucao: val
+                          })
+                      })
+                      )
+                    }).catch(e => {
+                    })
+                }
+              }
+            ]
+          );
+
+        }} />
+      </>
+    );
+  }
+
   function ListaCardapioDia() {
     const cd = cardapioDia.map((item, index) => {
       let _item = item.data().Cardapio;
@@ -319,7 +374,9 @@ const SelecaoPratoDia = ({ navigation }) => {
               <Text style={{ color: '#fff', marginLeft: 5, }}>{i.prato}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
-              <TouchableOpacity style={{
+              <Swt />
+
+              {/* <TouchableOpacity style={{
                 backgroundColor: '#00D1FF',
                 //padding:5,
                 alignItems: 'center',
@@ -344,7 +401,7 @@ const SelecaoPratoDia = ({ navigation }) => {
                 elevation: 5,
               }} onPress={() => alert(`Deletar ${i.prato}`)} >
                 <Icon name='trash' type='FontAwesome5' style={{ color: '#fff', fontSize: 15 }} />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
         );

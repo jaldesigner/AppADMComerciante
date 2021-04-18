@@ -19,12 +19,12 @@ const RodaPe = () => {
   useFocusEffect(React.useCallback(() => {
     const subscriber = DB.collection('Pedidos')
       .where('Data_Pedido', '==', InfData)
-      .where('Execucao','==',false)
-      .where('Entrega','==',false)
+      .where('Execucao', '==', false)
+      .where('Entrega', '==', false)
       .onSnapshot(snp => {
         setContaPedidos(snp.docs);
       });
-      return ()=> subscriber();
+    return () => subscriber();
   }, []));
 
   return (

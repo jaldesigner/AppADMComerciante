@@ -157,47 +157,6 @@ export default function CadastraPrato({ navigation }) {
               </View>
             </CardTpl>
 
-            <CardTpl titulo="Dividida">
-
-              <View style={aparencia.row}>
-                <Text style={{ color: '#fff', marginRight: 10 }}>Ativar divisão</Text>
-                <CheckBox value={cb} onValueChange={novoValor => { setCb(novoValor); GravaEstadoDivisão(novoValor) }} />
-              </View>
-
-              {
-                cb == false
-                  ? <View />
-                  : (
-                    <View style={aparencia.row}>
-
-                      <View style={{ flex: 2 }}>
-                        <Text style={{ color: '#fff' }}>Valor do acrescimo</Text>
-                      </View>
-
-                      <View style={{ flex: 1 }}>
-                        <TextInput
-                          placeholderTextColor="#aaa"
-                          placeholder="Exp.: 2,00"
-                          style={estilo.inpText}
-                          value={maskDinheiro(acrescimoDividida)}
-                          onChangeText={acrescimo => {
-                            setAcrescimoDividida(acrescimo);
-                          }}
-                        />
-                      </View>
-
-                      <View>
-                        <TouchableOpacity style={{ backgroundColor: '#F64000', marginLeft: 5 }} onPress={()=>  GravaValorDivisão(maskDinheiro(acrescimoDividida))}>
-                          <Text style={{ color: '#fff', padding: 9 }}>OK</Text>
-                        </TouchableOpacity>
-                      </View>
-
-                    </View>
-                  )
-              }
-
-            </CardTpl>
-
             <CardTpl titulo="Medidas cadastradas">
               <View>
                 <Fl />
