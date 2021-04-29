@@ -1,6 +1,6 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Alert} from 'react-native';
-import {Icon, Button} from 'native-base';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { Icon, Button } from 'native-base';
 //import estilo from '../style';
 
 /*
@@ -14,7 +14,7 @@ import {Icon, Button} from 'native-base';
  
 */
 
-export const CardTpl = ({titulo, ...props}) => {
+export const CardTpl = ({ titulo, ...props }) => {
   return (
     <View style={style.boxCard}>
       <View style={style.boxTituloCard}>
@@ -26,7 +26,7 @@ export const CardTpl = ({titulo, ...props}) => {
   );
 };
 
-export const CardST = ({...props}) => {
+export const CardST = ({ ...props }) => {
   return (
     <View style={style.boxCard}>
       <View style={style.boxContentCard}>{props.children}</View>
@@ -45,12 +45,12 @@ export const CardST = ({...props}) => {
  
 */
 
-export const CardPedido = ({nome, ...props}) => {
+export const CardPedido = ({ nome, ...props }) => {
   return (
     <View style={style.boxCard}>
       <View style={style.boxTituloCard}>
         <View style={style.circlePedidos}>
-          <Text style={style.txtCirclePedidos}>{nome.substr(0,1)}</Text>
+          <Text style={style.txtCirclePedidos}>{nome.substr(0, 1)}</Text>
         </View>
         <Text style={style.txtTituloCard}>{nome}</Text>
       </View>
@@ -72,17 +72,17 @@ export const CardPedido = ({nome, ...props}) => {
  
 */
 
-export const CardMontagem = ({titulo, ...props}) => {
+export const CardMontagem = ({ titulo, ...props }) => {
   return (
     <View style={style.boxCard}>
       <View style={style.boxTituloCard}>
-        <View style={{alignItems: 'center', flexDirection: 'row'}}>
+        <View style={{ alignItems: 'center', flexDirection: 'row' }}>
           <Icon
-            style={{color: '#FF6B00', fontSize: 12, marginRight:10,}}
+            style={{ color: '#FF6B00', fontSize: 12, marginRight: 10, }}
             type="FontAwesome5"
             name="check"
           />
-          <Text style={{fontSize: 18, color: '#7EE8FF'}}>{titulo}</Text>
+          <Text style={{ fontSize: 18, color: '#7EE8FF' }}>{titulo}</Text>
         </View>
       </View>
       <View style={style.boxContentCard}>{props.children}</View>
@@ -102,7 +102,7 @@ export const CardMontagem = ({titulo, ...props}) => {
                                                                >=>                      
  
 */
-export const BtnLight = ({...props}) => {
+export const BtnLight = ({ ...props }) => {
   return (
     <TouchableOpacity style={style.btnLight} onPress={props.onPress}>
       <Text style={style.btnLightTxt}>{props.value}</Text>
@@ -122,12 +122,12 @@ export const BtnLight = ({...props}) => {
  
 */
 
-export const BtnSmallRight = ({...props}) => {
+export const BtnSmallRight = ({ ...props }) => {
   return (
     <TouchableOpacity style={style.BtnSmallRight} onPress={props.onPress}>
       <Text style={style.BtnSmallText}>{props.value}</Text>
       <Icon
-        style={{color: '#02CD98', fontSize: 18}}
+        style={{ color: '#02CD98', fontSize: 18 }}
         type="FontAwesome5"
         name="arrow-right"
       />
@@ -135,11 +135,11 @@ export const BtnSmallRight = ({...props}) => {
   );
 };
 
-export const BtnSmallLeft = ({...props}) => {
+export const BtnSmallLeft = ({ ...props }) => {
   return (
     <TouchableOpacity style={style.BtnSmallRight} onPress={props.onPress}>
       <Icon
-        style={{color: '#02CD98', fontSize: 18}}
+        style={{ color: '#02CD98', fontSize: 18 }}
         type="FontAwesome5"
         name="arrow-left"
       />
@@ -162,7 +162,7 @@ const style = StyleSheet.create({
 
   circlePedidos: {
     backgroundColor: '#FF6B00',
-    width:40,
+    width: 40,
     height: 40,
     padding: 5,
     borderRadius: 20,
@@ -175,17 +175,17 @@ const style = StyleSheet.create({
     fontSize: 25,
     color: '#fff',
   },
-//Card comum
+  //Card comum
   boxCard: {
-    margin: 15,
+    margin: 5,
     marginBottom: 5,
     elevation: 6,
     backgroundColor: '#353857',
     borderColor: '#32465d',
     borderWidth: 0.9,
     borderStyle: 'solid',
-    borderRadius: 10,
-    padding:5,
+    borderRadius: 5,
+    padding: 5,
   },
   boxTituloCard: {
     borderBottomColor: '#32465d',
@@ -210,6 +210,7 @@ const style = StyleSheet.create({
   boxContentCard: {
     margin: 10,
   },
+  
   /**
    * Botão light da aplicação
    */

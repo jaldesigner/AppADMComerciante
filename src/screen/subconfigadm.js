@@ -28,6 +28,7 @@ export default function Home({ navigation }) {
           <View style={estilo.conteudo}>
             <View style={estilos.boxBtn}>
               <BtnNavegacao_1 titulo="Cadastrar ADM" page="CadastroADM" />
+              <BtnNavegacao_1 titulo="Controle" page="Controle" />
             </View>
           </View>
         </Content>

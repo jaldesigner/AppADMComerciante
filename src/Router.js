@@ -20,6 +20,7 @@ import Medidas from './screen/Medidas';
 import Configuracao from './screen/configuracao';
 import SubConfigAdm from './screen/subconfigadm';
 import CadastroADM from './screen/adm/CadastroADM';
+import Controle from './screen/controle';
 import MenuLef from './components/navBarLeft';
 
 //const Stack = createStackNavigator();
@@ -98,6 +99,11 @@ export default function App() {
         <Drawer.Screen
           name="CadastroADM"
           component={CadastroADM}
+          options={{ headerTransparent: true, title: false, headerLeft: null }}
+        />
+        <Drawer.Screen
+          name="Controle"
+          component={Controle}
           options={{ headerTransparent: true, title: false, headerLeft: null }}
         />
 
