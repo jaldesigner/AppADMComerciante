@@ -29,6 +29,7 @@ const SelecaoPratoDia = ({ navigation }) => {
   const [arrayValores, setArrayValores] = useState([]);
   const [cardapioDia, setCardapioDia] = useState([]);
   const [autoVal, setAutoVal] = useState(0);
+  const [ativo, setAtivo] = useState(true);
 
   useEffect(() => {
     const subscriber = DB.collection('Pratos')
@@ -267,7 +268,7 @@ const SelecaoPratoDia = ({ navigation }) => {
       const criaArray = (array) => {
         const arr = [];
         for (const item of array) {
-          arr.push(item.prato)
+          arr.push(item.prato);
         }
         return arr;
       }
@@ -278,7 +279,9 @@ const SelecaoPratoDia = ({ navigation }) => {
       if (existeItem == -1) {
         listaPratosDia.push({
           prato: valueListaPrato,
-          info: arrayValores
+          info: arrayValores,
+          ativo: true,
+          idPrato: (new Date()).getTime().toString(36),
         });
 
         setctx_SP(listaPratosDia);
@@ -309,14 +312,14 @@ const SelecaoPratoDia = ({ navigation }) => {
     }
   }//Exibe ou esconde o botão de avançar
 
-  function Swt({valor}) {
-    var val = valor;
+  function Swt({ ...props }) {
+
     return (
       <>
-        <Switch value={val ? true : false} onValueChange={() => {
+        <Switch value={props.ativo ? true : false} onValueChange={() => {
           Alert.alert(
             "Atenção!",
-            val ? "Deseja realmente retirar este pedido da execução?" : "Deseja realmente por este pedido em execução?",
+            props.ativo ? "Deseja realmente desativar este prato?" : "O prato será reativado e ficara visível para os cliente?",
             [
               {
                 text: "Não",
@@ -326,19 +329,46 @@ const SelecaoPratoDia = ({ navigation }) => {
               {
                 text: "Sim",
                 onPress: () => {
+
+                  var obj = props.data;
+                  var modo = true;
+                  var arr = [];
+
+                  obj.Cardapio.map((it, ind) => {
+                    arr.push(it);
+                  });
+
+                  arr[props.index].ativo = !props.ativo;
+
                   DB.collection('CardapioDoDia')
-                    .get().then(snp => {
-                      val = val ? false : true;
-                      setId(snp.docs.map((sn) => {
-                        DB.collection('CardapioDoDia')
-                          .doc(sn.id)
-                          .update({
-                            Execucao: val
-                          })
-                      })
-                      )
-                    }).catch(e => {
+                    .doc(props.idCardapio)
+                    .update(
+                      {
+                        Cardapio: arr,
+                      }
+                    ).catch(e => {
+                      console.log(e);
                     })
+
+                  //console.log(arr);
+
+                  // obj.Cardapio[props.index].map((i,ind) => {
+                  //   console.log(i);
+                  // });
+                  // DB.collection('CardapioDoDia')
+                  // .doc(props.idCardapio)
+                  // .update(
+                  //   {
+                  //     Cardapio:[{ativo:!props.ativo}]
+                  //   }
+                  // ).catch(e => {
+                  //   console.log(e);
+                  // })
+                  // DB.collection('CardapioDoDia')
+                  //   .doc(props.idPratoDia)
+                  //   .update({
+                  //     Ativo: !props.ativo
+                  //   })
                 }
               }
             ]
@@ -351,9 +381,9 @@ const SelecaoPratoDia = ({ navigation }) => {
 
   function ListaCardapioDia() {
     const cd = cardapioDia.map((item, index) => {
+      let idCardapio = item.id;
       let _item = item.data().Cardapio;
       const prt = _item.map((i, ind) => {
-
         return (
           <View key={ind} style={{
             backgroundColor: '#51557D',
@@ -374,34 +404,12 @@ const SelecaoPratoDia = ({ navigation }) => {
               <Text style={{ color: '#fff', marginLeft: 5, }}>{i.prato}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
-              <Swt />
-
-              {/* <TouchableOpacity style={{
-                backgroundColor: '#00D1FF',
-                //padding:5,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 15,
-                width: 30,
-                height: 30,
-                elevation: 5,
-                marginRight: 10,
-              }} onPress={() => alert(`Editar ${i.prato}`)} >
-                <Icon name='edit' type='FontAwesome5' style={{ color: '#fff', fontSize: 15 }} />
-              </TouchableOpacity>
-
-              <TouchableOpacity style={{
-                backgroundColor: '#FF5757',
-                //padding:5,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 15,
-                width: 30,
-                height: 30,
-                elevation: 5,
-              }} onPress={() => alert(`Deletar ${i.prato}`)} >
-                <Icon name='trash' type='FontAwesome5' style={{ color: '#fff', fontSize: 15 }} />
-              </TouchableOpacity> */}
+              <Swt
+                data={item.data()}
+                index={ind}
+                ativo={i.ativo}
+                idCardapio={idCardapio}
+              />
             </View>
           </View>
         );

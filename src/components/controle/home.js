@@ -24,26 +24,143 @@ const HomeControle = () => {
   }, []);
 
 
-/* -------------------------------------------------------------------------- */
-/*                        Área de trtatamento do modal                        */
-/* -------------------------------------------------------------------------- */
+  /* -------------------------------------------------------------------------- */
+  /*                        Área de trtatamento do modal                        */
+  /* -------------------------------------------------------------------------- */
 
-function getValorBruto(data){
-  const mp = pedidos.map((item, index) =>{
-    if(data == item.data().Data_Pedido){
-      console.log(item.data().Data_Pedido);
+  function getValorBruto(data) {
+    var total = 0;
+    var arrNum = [];
+    const mp = pedidos.map((item, index) => {
+      if (data == item.data().Data_Pedido) {
+        let str = item.data().Total_Pagar;
+        let strFloat = str.replace(',', '.');
+        let numFloat = parseFloat(strFloat);
+
+        arrNum.push(numFloat);
+      }
+
+    });
+
+    for (var i = 0; i < arrNum.length; i++) {
+      total += arrNum[i];
     }
-  });
-  //console.log(data);
-}
 
-  const ViewModal = (props) => {
+    var FloatComZero = total.toFixed(2);
+    var ConverteNumeroEmString = FloatComZero.toString();
+    var numeroComVirgula = ConverteNumeroEmString.replace('.', ',');
+
+    return numeroComVirgula;
 
 
-    getValorBruto(props.data);
-    
+  }
+
+  function getValorBrutoCartao(data) {
+    var total = 0;
+    var arrNum = [];
+    const mp = pedidos.map((item, index) => {
+      if (data == item.data().Data_Pedido) {
+        if (item.data().Forma_de_Pagamento == 'Cartão') {
+          let str = item.data().Total_Pagar;
+          let strFloat = str.replace(',', '.');
+          let numFloat = parseFloat(strFloat);
+
+          arrNum.push(numFloat);
+        }
+      }
+
+    });
+
+    for (var i = 0; i < arrNum.length; i++) {
+      total += arrNum[i];
+    }
+
+    var FloatComZero = total.toFixed(2);
+    var ConverteNumeroEmString = FloatComZero.toString();
+    var numeroComVirgula = ConverteNumeroEmString.replace('.', ',');
+
+    return numeroComVirgula;
+  }
+
+  function getValorBrutoDinheiro(data) {
+    var total = 0;
+    var arrNum = [];
+    const mp = pedidos.map((item, index) => {
+      if (data == item.data().Data_Pedido) {
+        if (item.data().Forma_de_Pagamento == 'Dinheiro') {
+          let str = item.data().Total_Pagar;
+          let strFloat = str.replace(',', '.');
+          let numFloat = parseFloat(strFloat);
+
+          arrNum.push(numFloat);
+        }
+      }
+
+    });
+
+    for (var i = 0; i < arrNum.length; i++) {
+      total += arrNum[i];
+    }
+
+    var FloatComZero = total.toFixed(2);
+    var ConverteNumeroEmString = FloatComZero.toString();
+    var numeroComVirgula = ConverteNumeroEmString.replace('.', ',');
+
+    return numeroComVirgula;
+
+
+  }
+
+  function getPorcentagem(data, porcentagem) {
+    var total = 0;
+    var arrNum = [];
+    const mp = pedidos.map((item, index) => {
+      if (data == item.data().Data_Pedido) {
+
+        let str = item.data().Total_Pagar;
+        let strFloat = str.replace(',', '.');
+        let numFloat = parseFloat(strFloat);
+
+        arrNum.push(numFloat);
+
+      }
+
+    });
+
+    for (var i = 0; i < arrNum.length; i++) {
+      total += arrNum[i];
+    }
+
+    var FloatComZero = total.toFixed(2);
+    var prct = (FloatComZero * porcentagem) / 100;
+    var ConverteNumeroEmString = prct.toFixed(2).toString()
+    var numeroComVirgula = ConverteNumeroEmString.replace('.', ',');
+
+    return numeroComVirgula;
+
+
+  }
+
+  function somaPedidos(data) {
+    var contaPedidos = [];
+    const mp = pedidos.map(item => {
+      if (data == item.data().Data_Pedido) {
+        contaPedidos.push(item.data().ID_pdd);
+      }
+    });
+    return contaPedidos.length;
+  }
+
+  const ViewModal = () => {
+    var valorBruto = getValorBruto(dataModal);
+    var valorBrutoCartao = getValorBrutoCartao(dataModal);
+    var valorBrutoDinheiro = getValorBrutoDinheiro(dataModal);
+    var contaPedidos = somaPedidos(dataModal);
+    var porcentagem = getPorcentagem(dataModal, 5);
+
+
     return (
-      <Modal transparent={true} visible={modalVisivel} animationType='slide'>
+      <Modal transparent={true} visible={modalVisivel} animationType='fade'>
         <View style={styles.modal}>
           <View style={styles.infoBoxModal}>
             <View>
@@ -56,30 +173,31 @@ function getValorBruto(data){
             </View>
             <View style={styles.infoBoxContent}>
               <View style={{ flexDirection: 'column' }}>
-                <Text style={{ textAlign: 'center', color: '#B6B6B6' }}>{props.data}</Text>
-                <Text style={{ fontWeight: 'bold', fontSize: 36, color: "#fff", textAlign: 'center' }}>R$1.325,00</Text>
+                <Text style={{ textAlign: 'center', color: '#B6B6B6' }}>{dataModal}</Text>
+                <Text style={{ fontWeight: 'bold', fontSize: 36, color: "#fff", textAlign: 'center' }}>R${valorBruto}</Text>
               </View>
 
               <View style={styles.divisao} />
+
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={{ flex: 1, color: '#00D1FF', fontWeight: 'bold' }}>Pedidos</Text>
+                <Text style={{ color: '#fff' }}>{contaPedidos}</Text>
+              </View>
 
               <View style={{ flexDirection: 'row' }}>
                 <Text style={{ flex: 1, color: '#00D1FF', fontWeight: 'bold' }}>Cartão</Text>
-                <Text style={{ color: '#fff' }}>320,00</Text>
+                <Text style={{ color: '#fff' }}>R${valorBrutoCartao}</Text>
               </View>
               <View style={{ flexDirection: 'row' }}>
                 <Text style={{ flex: 1, color: '#00D1FF', fontWeight: 'bold' }}>Dinheiro</Text>
-                <Text style={{ color: '#fff' }}>1.005,00</Text>
-              </View>
-              <View style={{ flexDirection: 'row' }}>
-                <Text style={{ flex: 1, color: '#00D1FF', fontWeight: 'bold' }}>Pedidos</Text>
-                <Text style={{ color: '#fff' }}>80</Text>
+                <Text style={{ color: '#fff' }}>R${valorBrutoDinheiro}</Text>
               </View>
 
               <View style={styles.divisao} />
 
               <View style={{ flexDirection: 'row' }}>
-                <Text style={{ flex: 1, color: '#FF5757', fontWeight: 'bold' }}>Taxa</Text>
-                <Text style={{ color: '#FF5757' }}>66,25</Text>
+                <Text style={{ flex: 1, color: '#FF5757', fontWeight: 'bold' }}>Taxa(5%)</Text>
+                <Text style={{ color: '#FF5757' }}>{porcentagem}</Text>
               </View>
             </View>
           </View>
@@ -88,9 +206,9 @@ function getValorBruto(data){
     );
   }; //Modal com as informações
 
-/* -------------------------------------------------------------------------- */
-/*                            Fim da área do modal                            */
-/* -------------------------------------------------------------------------- */
+  /* -------------------------------------------------------------------------- */
+  /*                            Fim da área do modal                            */
+  /* -------------------------------------------------------------------------- */
 
   const ListaPedidos = () => {
     var getArray = [];
@@ -111,9 +229,9 @@ function getValorBruto(data){
 
     const lData = uniData.map((item, index) => {
       return (
-        <>
+        <View key={index}>
           <DataTable.Row >
-            <DataTable.Cell><Text key={index} style={{ color: '#7EE8FF' }}>{item}</Text></DataTable.Cell>
+            <DataTable.Cell><Text style={{ color: '#7EE8FF' }}>{item}</Text></DataTable.Cell>
             <DataTable.Cell><Text style={{ color: '#7EE8FF' }}>{ContaPedidos()[item]}</Text></DataTable.Cell>
             <DataTable.Cell>
               <IconButton
@@ -127,7 +245,7 @@ function getValorBruto(data){
               />
             </DataTable.Cell>
           </DataTable.Row>
-        </>
+        </View>
       );
     }); //Lista as datas sem repetições
 
@@ -137,7 +255,7 @@ function getValorBruto(data){
   const DT = () => {
     return (
       <View>
-        <ViewModal data={dataModal} />
+        <ViewModal />
         <DataTable>
           <DataTable.Header>
             <DataTable.Title><Text style={{ color: "#00D1FF", fontWeight: 'bold', fontSize: 16, }}>Data</Text></DataTable.Title>
