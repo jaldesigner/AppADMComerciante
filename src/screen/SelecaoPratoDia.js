@@ -340,6 +340,7 @@ const SelecaoPratoDia = ({ navigation }) => {
 
                   arr[props.index].ativo = !props.ativo;
 
+
                   DB.collection('CardapioDoDia')
                     .doc(props.idCardapio)
                     .update(
