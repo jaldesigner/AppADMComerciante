@@ -4,20 +4,20 @@ import { firebase } from '@react-native-firebase/auth';
 import { Container, Content, Button, Icon, Left, Right } from 'native-base';
 import { BtnNavegacao_1 } from '../components/Botoes';
 import estilos from '../style';
-
-//=============================
-// ==> Definição do template
-//=============================
+import NivelADM from '../function';
 import { Cabecalho, BtnNav } from '../components/header';
 import FooterTab_tpl from '../components/footerTab';
 import estilo from '../style';
 
 export default function Home({ navigation }) {
+
   const autentic = firebase.auth();
   const sair = () => {
     autentic.signOut();
     navigation.navigate('Login');
   };
+
+  var niveladm = NivelADM().nivel;
 
   return (
     <>
@@ -31,7 +31,7 @@ export default function Home({ navigation }) {
               <BtnNavegacao_1 titulo="Cadastrar Acompanhamento" page="CadastraAcompanhamento" />
               <BtnNavegacao_1 titulo="Valores" page="Valores" />
               <BtnNavegacao_1 titulo="Medidas" page="Medidas" />
-              <BtnNavegacao_1 titulo="ADM" page="SubConfigAdm" />
+              {niveladm == 1 ? <BtnNavegacao_1 titulo="ADM" page="SubConfigAdm" />:<View />}
             </View>
           </View>
         </Content>

@@ -30,20 +30,23 @@ const navBarLeft = props => {
   const autentic = auth();
   const sair = () => {
     autentic.signOut();
-    props.navigation.navigate('Login');
+    props.navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }]
+    });
   };
 
   return (
     <Container>
-      <Header style={{height:100, backgroundColor:'#3E4168', elevation:7}}>
+      <Header style={{ height: 100, backgroundColor: '#3E4168', elevation: 7 }}>
         <Body>
           <View style={estilo.LT}>
-            <Thumbnail  source={require('../img/logo.png')} style={{marginRight:10}} />
+            <Thumbnail source={require('../img/logo.png')} style={{ marginRight: 10 }} />
             <H3 style={estilo.tHeader}>{INFO.Nome_App}</H3>
           </View>
         </Body>
       </Header>
-      <View style={{backgroundColor: '#333651', flex: 1}}>
+      <View style={{ backgroundColor: '#333651', flex: 1 }}>
         <TouchableOpacity
           style={estilo.navLink}
           onPress={() => props.navigation.navigate('Home')}>
@@ -63,7 +66,7 @@ const navBarLeft = props => {
         </TouchableOpacity>
         <TouchableOpacity
           style={estilo.navLink}
-          onPress={() => props.navigation.navigate('Pratos')}>
+          onPress={() => props.navigation.navigate('SelecaoPratoDia')}>
           <Icon
             type="FontAwesome5"
             name="concierge-bell"
@@ -76,11 +79,11 @@ const navBarLeft = props => {
               fontSize: 20,
             }}
           />
-          <Text style={estilo.navText}>Pratos</Text>
+          <Text style={estilo.navText}>Cardápio</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={estilo.navLink}
-          onPress={() => props.navigation.navigate('Pratos')}>
+          onPress={() => props.navigation.navigate('ListaPedidos')}>
           <Icon
             type="FontAwesome5"
             name="list-alt"
@@ -158,7 +161,7 @@ const estilo = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop:10,
+    paddingTop: 10,
     paddingBottom: 10,
   },
   logo: {

@@ -1,25 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
-import { Container, Content, Icon, Picker} from 'native-base';
+import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { Container, Content, Icon, Picker } from 'native-base';
 import db from '@react-native-firebase/firestore';
 import estilo from '../style';
 import DadosApp from '../cfg';
 import { Cabecalho, BtnNav } from '../components/header';
 import FooterTab_tpl from '../components/footerTab';
-import { CardTpl, BtnLight, AlertDecisao } from '../components';
-//import { Picker } from '@react-native-community/picker';
-
+import { CardTpl, BtnLight } from '../components';
 export default function CadastraAcompanhamento({ navigation }) {
 
   const INF = DadosApp();
   const UID = (+new Date).toString(16);
   const PathDb = db().collection(INF.Categoria).doc(INF.ID_APP);
-
   const [valueAcompanhamento, setValueAcompanhamento] = useState('');
   const [acompanhamento, setAcompanhamento] = useState('');
   const [autDb, setAutDb] = useState('');
   const [acmpPrincipal, setAcmpPrincipal] = useState('');
-  const [pkAcmpGeral, setPkAcmpGeral] = useState('');
+  //const [pkAcmpGeral, setPkAcmpGeral] = useState('');
 
   function CadastrarPrato() {
     if (valueAcompanhamento === '') {
@@ -80,65 +77,26 @@ export default function CadastraAcompanhamento({ navigation }) {
   };
 
   useEffect(() => {
-    const ExibeAcompanhamentos = async () => {
-      const acmp = await PathDb
-        .collection('Acompanhamentos')
-        .orderBy('NomeAcompanhamento')
-        .get();
+    const acmp = PathDb
+      .collection('Acompanhamentos')
+      .orderBy('NomeAcompanhamento')
+      .onSnapshot(snp => {
+        setAcompanhamento(snp.docs);
+      });
 
-      setAcompanhamento(acmp.docs);
-      setAutDb('');
-    }
-    ExibeAcompanhamentos();
+    return () => acmp();
 
-  }, [autDb]);
+  }, []);
 
-  const acompanhamentoPrincipal = (acomp) => {
-    const dbAcmp = PathDb.collection('Acompanhamentos');
-    acompanhamento.map((i, index) => {
-      const slct = i.data().NomeAcompanhamento;
-      const estadoSlct = i.data().Principal;
-
-      if (acomp != slct) {
-        dbAcmp
-          .where('NomeAcompanhamento', '==', acomp)
-          .get()
-          .then(snp => {
-            snp.forEach(exc => {
-              dbAcmp.doc(exc.id).update({
-                Principal: true,
-              })
-            });
-          })
-
-      } else {
-        dbAcmp
-          .get()
-          .then(snp => {
-            snp.forEach(exc => {
-              dbAcmp.doc(exc.id).update({
-                Principal: false,
-              })
-            });
-          })
-      }
-
-    })
-  };
   useEffect(() => {
 
-    const ExbAcompanhamentoPadrao = () => {
-
-      PathDb.collection('Acompanhamentos')
-        .where('Principal', '==', true)
-        .get()
-        .then(i => {
-          setAcmpPrincipal(i.docs[0].data().NomeAcompanhamento);
-        })
-
-    }
-    ExbAcompanhamentoPadrao();
-  }, [pkAcmpGeral]);
+    const ExbAcompanhamentoPadrao = PathDb.collection('Acompanhamentos')
+      .where('Principal', '==', true)
+      .onSnapshot(snp => {
+        setAcmpPrincipal(snp.docs[0].data().NomeAcompanhamento);
+      });
+    return () => ExbAcompanhamentoPadrao();
+  }, []);
 
   const Fl = () => {
     if (acompanhamento.length === 0 || acompanhamento.length === undefined) {
@@ -163,6 +121,7 @@ export default function CadastraAcompanhamento({ navigation }) {
       return prt;
     }
   };
+
   return (
     <>
       <Container style={estilo.container}>
@@ -182,46 +141,6 @@ export default function CadastraAcompanhamento({ navigation }) {
               </View>
               <View>
                 <BtnLight value="Cadastrar" onPress={() => CadastrarPrato()} />
-              </View>
-            </CardTpl>
-
-            <CardTpl titulo="Principal">
-              <View>
-                <Picker
-                  style={{ backgroundColor: '#fff' }}
-                  mode='dropdown'
-                  value={acmpPrincipal}
-                  onValueChange={ac => {
-                    setPkAcmpGeral(ac);
-                    acompanhamentoPrincipal(ac);
-                  }} >
-                  <Picker.Item
-                    key=''
-                    label='Selecione'
-                    value={false}
-                  />
-                  {
-                    acompanhamento.length == 0
-                      ?
-                      (null)
-                      :
-                      acompanhamento.map((i, index) => {
-                        return (
-                          <Picker.Item
-                            key=''
-                            label={i.data().NomeAcompanhamento}
-                            value={i.data().NomeAcompanhamento}
-                          />
-                        );
-                      })
-                  }
-                </Picker>
-              </View>
-              <View style={{marginTop: 10,}}>
-                <View style={estilo.boxTextLista}>
-                  <View style={estilo.sqrLista} />
-                  <Text style={estilo.txtLista}>{acmpPrincipal}</Text>
-                </View>
               </View>
             </CardTpl>
             <CardTpl titulo="Acompanhementos">

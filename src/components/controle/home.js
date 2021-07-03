@@ -233,16 +233,31 @@ const HomeControle = () => {
           <DataTable.Row >
             <DataTable.Cell><Text style={{ color: '#7EE8FF' }}>{item}</Text></DataTable.Cell>
             <DataTable.Cell><Text style={{ color: '#7EE8FF' }}>{ContaPedidos()[item]}</Text></DataTable.Cell>
-            <DataTable.Cell>
-              <IconButton
-                icon="eye"
-                color="#fff"
-                size={20}
-                onPress={() => {
-                  setModalVisivel(true);
-                  setDataModal(item);
-                }}
-              />
+            <DataTable.Cell style={{ justifyContent: 'space-evenly', alignItems: 'center', }}>
+              <View>
+                <IconButton
+                  icon="eye"
+                  color="#fff"
+                  size={20}
+                  style={{ backgroundColor: "#FF5757" }}
+                  onPress={() => {
+                    setModalVisivel(true);
+                    setDataModal(item);
+                  }}
+                />
+              </View>
+              <View>
+                <IconButton
+                  icon="finance"
+                  color="#fff"
+                  size={20}
+                  style={{ backgroundColor: "#FF5757" }}
+                  onPress={() => {
+                    setModalVisivel(true);
+                    setDataModal(item);
+                  }}
+                />
+              </View>
             </DataTable.Cell>
           </DataTable.Row>
         </View>

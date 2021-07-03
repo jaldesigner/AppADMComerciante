@@ -1,4 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState,useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
+import db from '@react-native-firebase/firestore';
+import DadosApp from '../cfg';
+
+export default function NivelADM() {
+  const aut = auth();
+  const INF = DadosApp();
+  const ft = db().collection(INF.Categoria).doc(INF.ID_APP);
+  const [nivel, setNivel] = useState('');
+  //const [array, setNivel] = useState('');
+  
+  var email = aut.currentUser;
+  useFocusEffect(useCallback(() => {
+    const unsubscribe = ft.collection('ADM')
+      .where('email', '==', email.email)
+      .onSnapshot(snp => {
+        setNivel(snp.docs[0].data());
+      });
+    return () => unsubscribe();
+  }, []));
+ 
+
+  return nivel;
+
+};
 
 export const MoedaReal = (valor) => {
   var valor = valor.toFixed(2).split('.');
