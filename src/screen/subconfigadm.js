@@ -27,7 +27,7 @@ export default function Home({ navigation }) {
           <Cabecalho titulo="Configurações" subtitulo="Administração" />
           <View style={estilo.conteudo}>
             <View style={estilos.boxBtn}>
-              <BtnNavegacao_1 titulo="Cadastrar ADM" page="CadastroADM" />
+              <BtnNavegacao_1 titulo="Administradores" page="CadastroADM" />
               <BtnNavegacao_1 titulo="Controle" page="Controle" />
             </View>
           </View>

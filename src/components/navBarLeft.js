@@ -1,23 +1,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
-import { useNavigation } from '@react-navigation/native';
 import {
-  Container,
-  Header,
-  Body,
-  Footer,
-  Content,
-  Icon,
-  H3,
-  List,
-  ListItem,
-  Separator,
-  Thumbnail
+  Container, Header, Body, Icon, H3, Thumbnail
 } from 'native-base';
 import DadosApp from '../cfg';
-import INF from '../cfg';
 
 const INFO = DadosApp();
 
@@ -113,8 +100,25 @@ const navBarLeft = props => {
               fontSize: 20,
             }}
           />
-          <Text style={estilo.navText}>Configuração</Text>
+          <Text style={estilo.navText}>Opções</Text>
         </TouchableOpacity>
+        {/* <TouchableOpacity
+          style={estilo.navLink}
+          onPress={() => props.navigation.navigate('SubConfigAdm')}>
+          <Icon
+            type="FontAwesome5"
+            name="user-shield"
+            style={{
+              color: '#fff',
+              backgroundColor: '#F6B900',
+              borderRadius: 10,
+              padding: 5,
+              marginRight: 10,
+              fontSize: 20,
+            }}
+          />
+          <Text style={estilo.navText}>ADM</Text>
+        </TouchableOpacity> */}
         <TouchableOpacity
           style={estilo.navLink}
           onPress={() => sair()}>
@@ -123,7 +127,7 @@ const navBarLeft = props => {
             name="door-open"
             style={{
               color: '#fff',
-              backgroundColor: '#F64000',
+              backgroundColor: '#4D0303',
               borderRadius: 10,
               padding: 5,
               marginRight: 10,

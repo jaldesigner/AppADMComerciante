@@ -24,12 +24,11 @@ export default function Home({ navigation }) {
       <Container style={{ backgroundColor: '#2D3043' }}>
         <BtnNav />
         <Content>
-          <Cabecalho titulo="Configurações" subtitulo="Administração" />
+          <Cabecalho titulo="Opções" subtitulo="Administração" />
           <View style={estilo.conteudo}>
             <View style={estilos.boxBtn}>
               <BtnNavegacao_1 titulo="Cadastrar Prato" page="CadastraPrato" />
               <BtnNavegacao_1 titulo="Cadastrar Acompanhamento" page="CadastraAcompanhamento" />
-              <BtnNavegacao_1 titulo="Valores" page="Valores" />
               <BtnNavegacao_1 titulo="Medidas" page="Medidas" />
               {niveladm == 1 ? <BtnNavegacao_1 titulo="ADM" page="SubConfigAdm" />:<View />}
             </View>

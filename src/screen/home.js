@@ -33,7 +33,7 @@ export default function Home({ navigation }) {
               <View style={{ padding: 10 }}>
                 <BtnNavegacao_1 titulo="Cardápio" page="SelecaoPratoDia" />
                 <BtnNavegacao_1 titulo="Pedidos" page="ListaPedidos" />
-                <BtnNavegacao_1 titulo="Configuração" page="Configuracao" />
+                <BtnNavegacao_1 titulo="Opções" page="Configuracao" />
               </View>
             </View>
 
