@@ -105,7 +105,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:142759402212:android:41c0d24e31d2b5f9f36af1",
         "android_client_info": {
-          "package_name": "com.jd_refeicao"
+          "package_name": "br.com.deartis.jd_refeicao"
         }
       },
       "oauth_client": [

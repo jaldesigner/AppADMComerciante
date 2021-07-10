@@ -25,11 +25,13 @@ const CadastroADM = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [rSenha, setRSenha] = useState('');
-  const [admdb, setAdmdb] = useState([]);
+  //const [admdb, setAdmdb] = useState([]);
 
   const addAdmDb = () => {
     let cadAdm = DB.collection("ADM")
       .add({
+        principal: false,
+        admApp: false,
         nome: nome,
         email: email,
         ativo: true,
@@ -54,10 +56,13 @@ const CadastroADM = ({ navigation }) => {
           setRSenha('');
           setNivelAdm('');
           alert('Administrador cadastrado com sucesso!');
+          navigation.navigate('ListaAdm');
         } else {
           alert('Administrador já cadastrado');
         }
 
+      }).catch(e=>{
+        console.log(e);
       })
 
   }

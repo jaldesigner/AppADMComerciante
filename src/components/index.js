@@ -208,7 +208,6 @@ const style = StyleSheet.create({
     fontWeight: 'bold',
   },
   boxContentCard: {
-    margin: 10,
   },
   
   /**
