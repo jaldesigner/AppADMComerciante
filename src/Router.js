@@ -22,6 +22,7 @@ import SubConfigAdm from './screen/subconfigadm';
 import CadastroADM from './screen/adm/CadastroADM';
 import ListaAdm from './screen/adm/ListaAdm';
 import Controle from './screen/controle';
+import ControleDia from './screen/controleDia';
 import MenuLef from './components/navBarLeft';
 
 //const Stack = createStackNavigator();
@@ -110,6 +111,11 @@ export default function App() {
         <Drawer.Screen
           name="Controle"
           component={Controle}
+          options={{ headerTransparent: true, title: false, headerLeft: null }}
+        />
+        <Drawer.Screen
+          name="ControleDia"
+          component={ControleDia}
           options={{ headerTransparent: true, title: false, headerLeft: null }}
         />
 

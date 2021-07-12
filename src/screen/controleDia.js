@@ -7,22 +7,20 @@ import {
   Pressable,
   TouchableOpacity,
 } from 'react-native';
-import {useNavigation} from "@react-navigation/native";
-import {DataTable, IconButton} from 'react-native-paper';
+import {Container, Content} from 'native-base';
+import {Card, DataTable, IconButton} from 'react-native-paper';
 import db, {firebase} from '@react-native-firebase/firestore';
-import DadosApp, {InfData, Hora} from '../../cfg';
-import  moment from 'moment';
-import 'moment/locale/pt-br';
+import DadosApp, {InfData, Hora} from '../cfg';
+import {Cabecalho, BtnNav} from '../components/header';
+import {CardST} from '../components';
+import FooterTab_tpl from '../components/footerTab';
+import estilo from '../style';
 
-const HomeControle = () => {
-  const navigation = useNavigation();
+const ControleDia = ({navigation}) => {
   var INF = DadosApp();
   var DB = db().collection(INF.Categoria).doc(INF.ID_APP);
 
   const [modalVisivel, setModalVisivel] = useState(false);
-  const [modalVisivelInfoDetalhada, setModalVisivelInfoDetalhada] = useState(
-    false,
-  );
   const [pedidos, setPedidos] = useState([]);
   const [dataModal, setDataModal] = useState('');
 
@@ -225,36 +223,6 @@ const HomeControle = () => {
     );
   }; //Modal com as informações
 
-  const InfoDetalhada = () => {
-    var valorBruto = getValorBruto(dataModal);
-    var valorBrutoCartao = getValorBrutoCartao(dataModal);
-    var valorBrutoDinheiro = getValorBrutoDinheiro(dataModal);
-    var contaPedidos = somaPedidos(dataModal);
-    var porcentagem = getPorcentagem(dataModal, 5);
-
-    return (
-      <Modal
-      style={{flex:1, backgroundColor:"#000"}}
-        transparent={true}
-        visible={modalVisivelInfoDetalhada}
-        animationType="fade">
-        <View style={styles.infoBoxContent}>
-          <Pressable
-            style={styles.btnFechar}
-            onPress={() => {
-              setModalVisivelInfoDetalhada(false);
-              setDataModal('');
-            }}>
-            <Text style={styles.txtBtnFechar}>X</Text>
-          </Pressable>
-          <View>
-            <ControleDia />
-          </View>
-        </View>
-      </Modal>
-    );
-  }; //Modal com as informações
-
   /* -------------------------------------------------------------------------- */
   /*                            Fim da área do modal                            */
   /* -------------------------------------------------------------------------- */
@@ -307,7 +275,8 @@ const HomeControle = () => {
                   size={20}
                   style={{backgroundColor: '#FF5757'}}
                   onPress={() => {
-                    navigation.navigate("ControleDia",{auto:0});
+                    setModalVisivel(true);
+                    setDataModal(item);
                   }}
                 />
               </View>
@@ -320,50 +289,185 @@ const HomeControle = () => {
     return lData;
   };
 
-  const DT = () => {
-    return (
-      <View>
-        <ViewModal />
-        <DataTable>
-          <DataTable.Header>
-            <DataTable.Title>
-              <Text
-                style={{color: '#00D1FF', fontWeight: 'bold', fontSize: 16}}>
-                Data
-              </Text>
-            </DataTable.Title>
-            <DataTable.Title>
-              <Text
-                style={{color: '#00D1FF', fontWeight: 'bold', fontSize: 16}}>
-                Qnt
-              </Text>
-            </DataTable.Title>
-            <DataTable.Title>
-              <Text
-                style={{color: '#00D1FF', fontWeight: 'bold', fontSize: 16}}>
-                Inf
-              </Text>
-            </DataTable.Title>
-          </DataTable.Header>
-          <ListaPedidos />
+  // const DT = () => {
+  //   return (
+  //     <View>
+  //       <ViewModal />
+  //       <DataTable>
+  //         <DataTable.Header>
+  //           <DataTable.Title><Text style={{ color: "#00D1FF", fontWeight: 'bold', fontSize: 16, }}>Data</Text></DataTable.Title>
+  //           <DataTable.Title><Text style={{ color: "#00D1FF", fontWeight: 'bold', fontSize: 16, }}>Qnt</Text></DataTable.Title>
+  //           <DataTable.Title><Text style={{ color: "#00D1FF", fontWeight: 'bold', fontSize: 16, }}>Inf</Text></DataTable.Title>
+  //         </DataTable.Header>
+  //         <ListaPedidos />
 
-          {/* <DataTable.Pagination
-            page={1}
-            numberOfPages={3}
-            onPageChange={page => {
-              console.log(page);
-            }}
-            label="1-2 of 6"
-          /> */}
-        </DataTable>
-      </View>
-    );
-  }; // Exibição do Data Table
+  //         {/* <DataTable.Pagination
+  //           page={1}
+  //           numberOfPages={3}
+  //           onPageChange={page => {
+  //             console.log(page);
+  //           }}
+  //           label="1-2 of 6"
+  //         /> */}
 
-  return <DT />;
+  //       </DataTable>
+
+  //     </View>
+  //   )
+  // }; // Exibição do Data Table
+  //#FFAF00
+  return (
+    <>
+      <Container style={{backgroundColor: '#2D3043'}}>
+        <BtnNav />
+        <Content>
+          <Cabecalho titulo="Controle" subtitulo="Administração" />
+          <CardST>
+            {/* Inicio da Tabela */}
+            <View>
+              <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
+                <Text
+                  style={{color: '#00D1FF', fontSize: 18, fontWeight: 'bold'}}>
+                  Prato:{' '}
+                </Text>
+                <Text style={{color: '#FF6B00'}}>Carré com Couve</Text>
+              </View>
+              <View
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#56597E',
+                  marginBottom: 10,
+                  marginTop: 10,
+                }}>
+                <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
+                  <View style={{flex: 2, padding: 5}}>
+                    <Text style={{color: '#00D1FF', fontSize: 16}}>
+                      Medidas
+                    </Text>
+                  </View>
+                  <View style={{flex: 1}}>
+                    <Text style={{color: '#00D1FF', fontSize: 16}}>
+                      Quantia
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Linhas de medidas */}
+                <View
+                  style={{
+                    borderTopColor: '#56597E',
+                    borderTopWidth: 1,
+                    flexDirection: 'row',
+                  }}>
+                  <View style={{flex: 2, padding: 5}}>
+                    <Text style={{color: '#FFAF00'}}>Grande</Text>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      borderColor: '#56597E',
+                      borderLeftWidth: 1,
+                      padding: 5,
+                    }}>
+                    <Text style={{color: '#FF6B00'}}>20</Text>
+                  </View>
+                </View>
+                {/* Linhas de medidas */}
+                <View
+                  style={{
+                    borderTopColor: '#56597E',
+                    borderTopWidth: 1,
+                    flexDirection: 'row',
+                  }}>
+                  <View style={{flex: 2, padding: 5}}>
+                    <Text style={{color: '#FFAF00'}}>Media</Text>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      borderColor: '#56597E',
+                      borderLeftWidth: 1,
+                      padding: 5,
+                    }}>
+                    <Text style={{color: '#FF6B00'}}>10</Text>
+                  </View>
+                </View>
+                {/* Linhas de medidas */}
+                <View
+                  style={{
+                    borderTopColor: '#56597E',
+                    borderTopWidth: 1,
+                    flexDirection: 'row',
+                  }}>
+                  <View style={{flex: 2, padding: 5}}>
+                    <Text style={{color: '#FFAF00'}}>Pequena</Text>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      borderColor: '#56597E',
+                      borderLeftWidth: 1,
+                      padding: 5,
+                    }}>
+                    <Text style={{color: '#FF6B00'}}>5</Text>
+                  </View>
+                </View>
+                {/* Linhas de medidas */}
+                <View
+                  style={{
+                    borderTopColor: '#56597E',
+                    borderTopWidth: 1,
+                    flexDirection: 'row',
+                  }}>
+                  <View style={{flex: 2, padding: 5}}>
+                    <Text style={{color: '#FFAF00'}}>Dividida</Text>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      borderColor: '#56597E',
+                      borderLeftWidth: 1,
+                      padding: 5,
+                    }}>
+                    <Text style={{color: '#FF6B00'}}>4</Text>
+                  </View>
+                </View>
+                {/* Linhas de medidas */}
+                <View
+                  style={{
+                    borderTopColor: '#56597E',
+                    borderTopWidth: 1,
+                    flexDirection: 'row',
+                  }}>
+                  <View style={{flex: 2, padding: 5,alignItems:'flex-start',justifyContent:'center'}}>
+                    <Text style={{color: '#00D1FF', fontWeight:'bold'}}>Receita: </Text>
+                    <Text style={{color: '#FF6B00'}}>R$1.070,00</Text>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      borderColor: '#56597E',
+                      borderLeftWidth: 1,
+                      padding: 5,
+                    }}>
+                    <View style={{flex: 2, padding: 5}}>
+                    <Text style={{color: '#00D1FF', fontWeight:'bold'}}>Total:</Text>
+                    <Text style={{color: '#FF6B00'}}>39</Text>
+                  </View>
+                  </View>
+                </View>
+
+              </View>
+            </View>
+            {/* Fim da Tabela */}
+          </CardST>
+        </Content>
+      </Container>
+    </>
+  );
 };
 
-export default HomeControle;
+export default ControleDia;
 
 const styles = StyleSheet.create({
   txtInicial: {
