@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,11 +7,12 @@ import {
   Pressable,
   TouchableOpacity,
 } from 'react-native';
-import {useNavigation} from "@react-navigation/native";
+import {useNavigation} from '@react-navigation/native';
 import {DataTable, IconButton} from 'react-native-paper';
 import db, {firebase} from '@react-native-firebase/firestore';
 import DadosApp, {InfData, Hora} from '../../cfg';
-import  moment from 'moment';
+import {CTX_Pedidos} from '../../context';
+import moment from 'moment';
 import 'moment/locale/pt-br';
 
 const HomeControle = () => {
@@ -25,6 +26,9 @@ const HomeControle = () => {
   );
   const [pedidos, setPedidos] = useState([]);
   const [dataModal, setDataModal] = useState('');
+  const [ctx_pedidos, setCtx_pedidos] = useContext(CTX_Pedidos);
+
+  //console.log(ctx_pedidos);
 
   useEffect(() => {
     const subscribe = DB.collection('Pedidos')
@@ -151,6 +155,21 @@ const HomeControle = () => {
     return contaPedidos.length;
   }
 
+  function dadosBalanco(data) {
+    let arr = [];
+
+    const mp = pedidos.map((item, index) => {
+      let i = item.data();
+
+      if (data == i.Data_Pedido) {
+        arr.push(i);
+      }
+    });
+
+    setCtx_pedidos(arr);
+    
+  }
+
   const ViewModal = () => {
     var valorBruto = getValorBruto(dataModal);
     var valorBrutoCartao = getValorBrutoCartao(dataModal);
@@ -234,7 +253,7 @@ const HomeControle = () => {
 
     return (
       <Modal
-      style={{flex:1, backgroundColor:"#000"}}
+        style={{flex: 1, backgroundColor: '#000'}}
         transparent={true}
         visible={modalVisivelInfoDetalhada}
         animationType="fade">
@@ -307,6 +326,7 @@ const HomeControle = () => {
                   size={20}
                   style={{backgroundColor: '#FF5757'}}
                   onPress={() => {
+                    dadosBalanco(item);
                     navigation.navigate("ControleDia",{auto:0});
                   }}
                 />
