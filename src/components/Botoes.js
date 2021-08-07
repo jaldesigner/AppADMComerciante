@@ -1,6 +1,7 @@
-import React from 'react';
+import React,{useEffect,useState,useCallback} from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect} from '@react-navigation/native';
+import {BtnLight} from './';
 
 export const BtnNavegacao_1 = ({ titulo, page }) => {
   const navigation = useNavigation();
@@ -15,6 +16,15 @@ export const BtnNavegacao_1 = ({ titulo, page }) => {
     </TouchableOpacity>
   );
 }
+
+export const BtnExpediente = ({...props}) => {
+  return (
+    <View>
+      <BtnLight value="Encerrar Expediente" onPress={props.onPress} />
+    </View>
+  );
+
+};
 
 const style = StyleSheet.create({
   BtnNavegacao_1Conteiner: {

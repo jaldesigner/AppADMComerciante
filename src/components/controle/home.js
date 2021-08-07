@@ -167,7 +167,6 @@ const HomeControle = () => {
     });
 
     setCtx_pedidos(arr);
-    
   }
 
   const ViewModal = () => {
@@ -295,7 +294,18 @@ const HomeControle = () => {
       return conta;
     }; //Conta os pedidos das datas
 
+    var arr = [];
+   // var data = new Object();
+
     const lData = uniData.map((item, index) => {
+      //console.log(item.replace('/\//g','-'));
+       var data = {data : new Date('21-03-2021')};
+       arr.push(data);
+        
+       function compara(a,b){
+         return a.data > b.data;
+       }
+        arr.sort(compara);
       return (
         <View key={index}>
           <DataTable.Row>
@@ -327,7 +337,7 @@ const HomeControle = () => {
                   style={{backgroundColor: '#FF5757'}}
                   onPress={() => {
                     dadosBalanco(item);
-                    navigation.navigate("ControleDia",{auto:0});
+                    navigation.navigate('ControleDia', {auto: 0});
                   }}
                 />
               </View>

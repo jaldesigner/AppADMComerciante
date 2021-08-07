@@ -1,4 +1,5 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useContext, useCallback} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 import {
   StyleSheet,
   Text,
@@ -16,7 +17,7 @@ import {CardST} from '../components';
 import FooterTab_tpl from '../components/footerTab';
 import estilo from '../style';
 import {CTX_Pedidos} from '../context';
-import {DB_Cardapio_Do_Dia,DB_Medidas} from '../controller';
+import {DB_Cardapio_Do_Dia, DB_Medidas} from '../controller';
 
 const ControleDia = ({navigation}) => {
   var INF = DadosApp();
@@ -25,6 +26,7 @@ const ControleDia = ({navigation}) => {
   var medidas = DB_Medidas();
 
   const [ctx_pedidos, setCtx_pedidos] = useContext(CTX_Pedidos);
+  const [mdd, setMdd] = useState([]);
 
   function ListaPratoDia() {
     ////------------------------------------------------------
@@ -34,17 +36,109 @@ const ControleDia = ({navigation}) => {
       return data;
     };
     var uniData = unicaData(ctx_pedidos);
-    /** Fim da Função de pegar uma única data */
-    ////------------------------------------------------------
+    /** Fim da função de pegar uma única data */
+    ////-----------------------------------------------------
 
-    console.log(medidas);
+    ////-----------------------------------------------------
+    /** Função que conta os pedidos por medidas */
+    const ContaMedidas = (TipoMedida, NomePrato) => {
+      let arr = [];
+      let t = ctx_pedidos.map(mm => {
+        mm.Pedido.map(m => {
+          if (m.Medida == TipoMedida) {
+            if (m.prato == NomePrato) {
+              arr.push(m.Medida);
+            }
+          }
+        });
+      });
+      return arr.length;
+    };
+    /**Fim da função que conta os pedidos por medidas */
+    ////-----------------------------------------------------
 
-    const lst = cardapio_do_dia.map((item, indexx) => {
+    ////-----------------------------------------------------
+    /** Função que soma todo o valor por prato */
+    const SomaValoresPorPrato = NomePrato => {
+      let arr = [];
+      let t = ctx_pedidos.map(mm => {
+        mm.Pedido.map(m => {
+          if (m.prato == NomePrato) {
+            arr.push(m.Valor);
+          }
+        });
+      });
+      //console.log(arr)
+      return arr;
+    };
+    /**Fim da função que soma todo o valor por prato */
+    ////-----------------------------------------------------
+
+    const lst = cardapio_do_dia.map(item => {
       let it = item.data();
+      var arr2 = [];
 
       const car = it.Cardapio.map((i, index) => {
+        var arr = [];
+        const reducer = (acomulador, valor) => acomulador + valor;
+        arr2.push(SomaValoresPorPrato(i.prato));
+
         if (it.Data == uniData) {
-          //console.log(i.prato);
+          function converteFloat(arrValor) {
+            let total = 0;
+            let arr = [];
+            arrValor.map(valor => {
+              let strNumFloat = valor.replace(',', '.');
+              let numFloat = parseFloat(strNumFloat);
+              arr.push(numFloat);
+            });
+
+            for (var i = 0; i < arr.length; i++) {
+              total += arr[i];
+            }
+
+            let nf = total.toFixed(2);
+            let strReal = nf.replace('.', ',');
+
+            return strReal;
+          }
+
+          const Me = () => {
+            let info = i.info.map((InfCardapio, idx) => {
+              arr.push(ContaMedidas(InfCardapio.medida, i.prato));
+
+              if (InfCardapio.valor !== null) {
+                return (
+                  <View
+                    key={idx}
+                    style={{
+                      borderTopColor: '#56597E',
+                      borderTopWidth: 1,
+                      flexDirection: 'row',
+                    }}>
+                    <View style={{flex: 2, padding: 5}}>
+                      <Text style={{color: '#FFAF00'}}>
+                        {InfCardapio.medida}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        flex: 1,
+                        borderColor: '#56597E',
+                        borderLeftWidth: 1,
+                        padding: 5,
+                      }}>
+                      <Text style={{color: '#FF6B00'}}>
+                        {ContaMedidas(InfCardapio.medida, i.prato)}
+                      </Text>
+                    </View>
+                  </View>
+                );
+              }
+            });
+            return info;
+          };
+
           return (
             <View key={index}>
               <CardST>
@@ -83,86 +177,8 @@ const ControleDia = ({navigation}) => {
                     </View>
 
                     {/* Linhas de medidas */}
-                    <View
-                      style={{
-                        borderTopColor: '#56597E',
-                        borderTopWidth: 1,
-                        flexDirection: 'row',
-                      }}>
-                      <View style={{flex: 2, padding: 5}}>
-                        <Text style={{color: '#FFAF00'}}>Grande</Text>
-                      </View>
-                      <View
-                        style={{
-                          flex: 1,
-                          borderColor: '#56597E',
-                          borderLeftWidth: 1,
-                          padding: 5,
-                        }}>
-                        <Text style={{color: '#FF6B00'}}>20</Text>
-                      </View>
-                    </View>
-                    {/* Linhas de medidas */}
-                    <View
-                      style={{
-                        borderTopColor: '#56597E',
-                        borderTopWidth: 1,
-                        flexDirection: 'row',
-                      }}>
-                      <View style={{flex: 2, padding: 5}}>
-                        <Text style={{color: '#FFAF00'}}>Media</Text>
-                      </View>
-                      <View
-                        style={{
-                          flex: 1,
-                          borderColor: '#56597E',
-                          borderLeftWidth: 1,
-                          padding: 5,
-                        }}>
-                        <Text style={{color: '#FF6B00'}}>10</Text>
-                      </View>
-                    </View>
-                    {/* Linhas de medidas */}
-                    <View
-                      style={{
-                        borderTopColor: '#56597E',
-                        borderTopWidth: 1,
-                        flexDirection: 'row',
-                      }}>
-                      <View style={{flex: 2, padding: 5}}>
-                        <Text style={{color: '#FFAF00'}}>Pequena</Text>
-                      </View>
-                      <View
-                        style={{
-                          flex: 1,
-                          borderColor: '#56597E',
-                          borderLeftWidth: 1,
-                          padding: 5,
-                        }}>
-                        <Text style={{color: '#FF6B00'}}>5</Text>
-                      </View>
-                    </View>
-                    {/* Linhas de medidas */}
-                    <View
-                      style={{
-                        borderTopColor: '#56597E',
-                        borderTopWidth: 1,
-                        flexDirection: 'row',
-                      }}>
-                      <View style={{flex: 2, padding: 5}}>
-                        <Text style={{color: '#FFAF00'}}>Dividida</Text>
-                      </View>
-                      <View
-                        style={{
-                          flex: 1,
-                          borderColor: '#56597E',
-                          borderLeftWidth: 1,
-                          padding: 5,
-                        }}>
-                        <Text style={{color: '#FF6B00'}}>4</Text>
-                      </View>
-                    </View>
-                    {/* Linhas de medidas */}
+                    {Me()}
+                    {/* Fim da linhas de medidas */}
                     <View
                       style={{
                         borderTopColor: '#56597E',
@@ -179,7 +195,9 @@ const ControleDia = ({navigation}) => {
                         <Text style={{color: '#00D1FF', fontWeight: 'bold'}}>
                           Receita:{' '}
                         </Text>
-                        <Text style={{color: '#FF6B00'}}>R$1.070,00</Text>
+                        <Text style={{color: '#FF6B00'}}>
+                          R${converteFloat(arr2[index])}
+                        </Text>
                       </View>
                       <View
                         style={{
@@ -192,7 +210,9 @@ const ControleDia = ({navigation}) => {
                           <Text style={{color: '#00D1FF', fontWeight: 'bold'}}>
                             Total:
                           </Text>
-                          <Text style={{color: '#FF6B00'}}>39</Text>
+                          <Text style={{color: '#FF6B00'}}>
+                            {arr.reduce(reducer)}
+                          </Text>
                         </View>
                       </View>
                     </View>
@@ -214,7 +234,10 @@ const ControleDia = ({navigation}) => {
       <Container style={{backgroundColor: '#2D3043'}}>
         <BtnNav />
         <Content>
-          <Cabecalho titulo="Controle" subtitulo="Administração" />
+          <Cabecalho
+            titulo="Controle"
+            subtitulo={`Data: ${ctx_pedidos[0].Data_Pedido}`}
+          />
           {ListaPratoDia()}
         </Content>
         <FooterTab_tpl />

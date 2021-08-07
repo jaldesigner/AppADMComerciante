@@ -27,9 +27,10 @@ export default function Home({ navigation }) {
           <Cabecalho titulo="Opções" subtitulo="Administração" />
           <View style={estilo.conteudo}>
             <View style={estilos.boxBtn}>
-              <BtnNavegacao_1 titulo="Cadastrar Prato" page="CadastraPrato" />
-              <BtnNavegacao_1 titulo="Cadastrar Acompanhamento" page="CadastraAcompanhamento" />
-              <BtnNavegacao_1 titulo="Medidas" page="Medidas" />
+              <BtnNavegacao_1 titulo="Cad. Pratos" page="CadastraPrato" />
+              <BtnNavegacao_1 titulo="Cad. Acompanhamentos" page="CadastraAcompanhamento" />
+              <BtnNavegacao_1 titulo="Cad. Medidas" page="Medidas" />
+              <BtnNavegacao_1 titulo="Cad. Valores" page="Valores" />
               {niveladm == 1 ? <BtnNavegacao_1 titulo="ADM" page="SubConfigAdm" />:<View />}
             </View>
           </View>
